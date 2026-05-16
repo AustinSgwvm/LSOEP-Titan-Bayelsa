@@ -1,5 +1,4 @@
 streamlit
-pandas
-plotly
-supabase
+st-postgresql
 psycopg2-binary
+SQLAlchemy
