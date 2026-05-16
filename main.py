@@ -280,13 +280,14 @@ with st.sidebar:
     if st.session_state.radar_threat:
         st.markdown(f'<div class="radar-sticky-threat">🚨 SECURITY WARNING: IDENTITY DUPLICATION COLLISION<br>{st.session_state.threat_msg}</div>', unsafe_allow_html=True)
 
+    # REPOSITIONED AND UPDATED INSTITUTIONAL LINK TABS (SHIFTED UPWARDS ABOVE COMMAND HUB)
+    st.markdown('<a href="https://ndcnigeria.com/" target="_blank" class="inst-link-box">🌐 NDC Nigeria</a>', unsafe_allow_html=True)
+    st.markdown('<a href="https://www.facebook.com/IamHSDickson" target="_blank" class="inst-link-box">🌐 Senator HSD Facebook</a>', unsafe_allow_html=True)
+    st.divider()
+
     st.markdown('<div class="admin-launch-zone">', unsafe_allow_html=True)
     adm_key = st.text_input("COMMAND HUB KEY", type="password", key="adm_v30_auth")
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.divider()
-    st.markdown('<a href="https://www.facebook.com/IamHSDickson" target="_blank" class="inst-link-box">🌐 Senator HSD Facebook</a>', unsafe_allow_html=True)
-    st.markdown('<a href="https://HSDickson.org" target="_blank" class="inst-link-box">🏛️ Senator HSD Web Portal</a>', unsafe_allow_html=True)
     
     st.divider()
     if st.button("🛠️ SKILL VOCATION POOL", key="btn_skill"): st.session_state.current_page = "skill_form"
