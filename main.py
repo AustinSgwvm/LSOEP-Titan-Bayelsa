@@ -6,20 +6,7 @@
 import streamlit as st
 import pandas as pd
 import datetime
-import subprocess
-import sys
 import os
-
-# ==============================================================================
-# STREAMLIT CLOUD DEPENDENCY COMPILATION LAYER (FORCED DEPLOYMENT BYPASS)
-# ==============================================================================
-try:
-    import plotly
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "plotly"])
-
-# 🛑 DECOUPLED BYPASS: Stripped auto-installer for supabase client wrapper 
-# to completely eliminate pyiceberg build/C++ compilation environment errors.
 
 # ==============================================================================
 # DATA ARCHITECTURE LAYER: TWO-LGA COMPLETE ADMINISTRATIVE MATRIX (NO OMISSIONS)
@@ -183,7 +170,6 @@ if 'threat_msg' not in st.session_state:
     st.session_state.threat_msg = ""
 
 # --- REARRANGED LOCAL SANBOX MATRIX OVERRIDE (THE CIRCUIT BREAKER) ---
-# This checks if the app is local or live to protect the execution line.
 IS_LOCAL_SANDBOX = not os.path.exists("/app/secrets.toml") and not os.path.exists(".streamlit/secrets.toml")
 
 # --- HARDENED CIRCUIT BREAKER MATRIX ---
@@ -292,12 +278,10 @@ with st.sidebar:
     if st.session_state.radar_threat:
         st.markdown(f'<div class="radar-sticky-threat">🚨 SECURITY WARNING: IDENTITY DUPLICATION COLLISION<br>{st.session_state.threat_msg}</div>', unsafe_allow_html=True)
 
-    # 💡 REPLACE: "GCON COMMAND HUB KEY" to "COMMAND HUB KEY"
     st.markdown('<div class="admin-launch-zone">', unsafe_allow_html=True)
     adm_key = st.text_input("COMMAND HUB KEY", type="password", key="adm_v30_auth")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # 💡 REPLACE & ADD: Facebook URL link injected alongside active website asset tracking portal
     st.divider()
     st.markdown('<a href="https://www.facebook.com/IamHSDickson" target="_blank" class="inst-link-box">🌐 Senator HSD Facebook</a>', unsafe_allow_html=True)
     st.markdown('<a href="https://HSDickson.org" target="_blank" class="inst-link-box">🏛️ Senator HSD Web Portal</a>', unsafe_allow_html=True)
@@ -314,7 +298,6 @@ with st.sidebar:
     st.divider()
     if st.button("🏛️ RETURN TO COMMAND HUB", key="btn_cmd"): st.session_state.current_page = "main_dashboard"
 
-    # 💡 REPLACEMENTS AND AMENDMENTS: Keys set up with mandatory contextual remarks inputs
     st.divider()
     st.markdown("<p style='color:#FFD700; font-weight:bold; text-transform: uppercase; letter-spacing: 1px;'>Field Authentication</p>", unsafe_allow_html=True)
     sup_key = st.text_input("WARD SUPERVISOR KEY", type="password", key="sup_v30_auth")
@@ -333,7 +316,6 @@ def render_marquee_header():
         branding.render_header() 
         branding.render_marquee()
     else:
-        # Gateway Page Scale Adjustments: Portrait containers scaled downward cleanly to minimize screen real estate overflow
         st.markdown('''
             <div style="background: linear-gradient(180deg, #061a33 0%, #020b17 100%); padding: 12px 18px; border-radius: 16px; border: 3px solid #FFD700; text-align: center; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                 <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 2px;">
@@ -351,7 +333,6 @@ def render_marquee_header():
 # ==============================================================================
 # --- SECTION A: WARD SUPERVISOR COMMAND (SAGBAMA & EKEREMOR) ---
 # ==============================================================================
-# 💡 REPLACE: Changed credential phrase evaluation matrix string pattern
 if sup_key == "ndc ndc 2027":
     render_marquee_header()
     st.markdown('<div class="white-registry-header">🛡️ WARD SUPERVISOR COMMAND: Form EC8A INTELLIGENCE VECTORS</div>', unsafe_allow_html=True)
@@ -364,7 +345,6 @@ if sup_key == "ndc ndc 2027":
             sup_state = st.text_input("State", value="Bayelsa")
             sup_lga = st.selectbox("LGA Location Partition", list(LGA_WARD_DATA.keys()), key="sup_lga_select")
             sup_ward = st.selectbox("Ward Name Location Partition", LGA_WARD_DATA.get(sup_lga, []), key="sup_ward_select")
-            # Reflect layout details matching agent form layout criteria, localized for Ward level tracking 
             sup_ward_unit_name = st.text_input("Ward Unit Name and Number")
         
         ward_id = f"{sup_lga}_{sup_ward}".replace(" ", "_").upper()
@@ -407,7 +387,6 @@ if sup_key == "ndc ndc 2027":
 # ==============================================================================
 # --- SECTION B: POLLING UNIT AGENT PORTAL (2 LGA VALIDATED) ---
 # ==============================================================================
-# 💡 REPLACE: Changed credential phrase evaluation matrix string pattern
 elif agt_key == "ndc 2027":
     render_marquee_header()
     st.markdown('<div class="white-registry-header">🗳️ POLLING UNIT AGENT: FIELD DATA ENTRY</div>', unsafe_allow_html=True)
@@ -543,12 +522,10 @@ elif st.session_state.current_page == "cun_trigger":
 # ==============================================================================
 # --- SECTION G: EXECUTIVE COMMAND HUB (2 LGA REAL-TIME ANALYTICAL PORTALS) ---
 # ==============================================================================
-# 💡 REPLACE: Broadened administrative credential gateway to accept both authorization codes cleanly
 elif adm_key == "ndc 2027" or adm_key == "ndc ndc 2027":
     render_marquee_header()
     st.markdown('<div class="white-registry-header">🏛️ EXECUTIVE COMMAND HUB: SAGBAMA & EKEREMOR STRATEGIC RATIOS</div>', unsafe_allow_html=True)
     
-    # Target tab updated to explicitly output requested string alignment matrix
     tabs = st.tabs([
         "📊 Registry", "📈 CUN Matrix", "⚖️ Audit Log", "🛡️ RADAR", 
         "🎓 CV Audit", "💎 Vantedge", "🗳️ Election Live Sync And Ratio Analytics", "📝 Ground Truth", 
@@ -698,8 +675,6 @@ else:
             st.text_input("Portfolio in the Community")
             st.file_uploader("Upload Leader NIN Slip Column Click", type=['pdf', 'jpg', 'png'], key="vouch_nin_slip")
         st.text_area("Leader's Remarks on Applicant")
-        
-        # Reduced dimension frame context labeling parameters for biometric integration
         st.camera_input("Biometric Face Capture Core Scan")
         
         if st.form_submit_button("🚀 SUBMIT ENROLLMENT"):
