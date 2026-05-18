@@ -333,18 +333,18 @@ def render_marquee_header():
         branding.render_header() 
         branding.render_marquee()
     else:
-        # Gateway Page Scale Adjustments: Portrait containers scaled slightly downward to minimize display overflow
+        # Gateway Page Scale Adjustments: Portrait containers scaled downward cleanly to minimize screen real estate overflow
         st.markdown('''
-            <div style="background: linear-gradient(180deg, #061a33 0%, #020b17 100%); padding: 18px; border-radius: 20px; border: 3px solid #FFD700; text-align: center; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 5px;">
-                    <div style="width: 55px; height: 55px; border-radius: 8px; border: 2px solid #FFD700; background-color: #030f21; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: inset 0 0 8px #FFD700;">🏛️</div>
+            <div style="background: linear-gradient(180deg, #061a33 0%, #020b17 100%); padding: 12px 18px; border-radius: 16px; border: 3px solid #FFD700; text-align: center; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 2px;">
+                    <div style="max-width: 45px; max-height: 45px; width: 45px; height: 45px; border-radius: 6px; border: 2px solid #FFD700; background-color: #030f21; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: inset 0 0 6px #FFD700;">🏛️</div>
                     <div>
-                        <h1 style="color:#FFD700; margin:0; font-size:2.0rem; font-weight:900; letter-spacing: 1px; text-transform: uppercase;">SENATOR HENRY SERIAKE DICKSON</h1>
-                        <p style="color:#FFF; margin:2px 0; font-weight:bold; font-size:12px; letter-spacing:3px; text-transform: uppercase;">NATIONAL ASSEMBLY SENATORIAL COMMAND HUB</p>
+                        <h1 style="color:#FFD700; margin:0; font-size:1.7rem; font-weight:900; letter-spacing: 1px; text-transform: uppercase;">SENATOR HENRY SERIAKE DICKSON</h1>
+                        <p style="color:#FFF; margin:1px 0; font-weight:bold; font-size:11px; letter-spacing:2px; text-transform: uppercase;">NATIONAL ASSEMBLY SENATORIAL COMMAND HUB</p>
                     </div>
-                    <div style="width: 55px; height: 55px; border-radius: 8px; border: 2px solid #FFD700; background-color: #030f21; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: inset 0 0 8px #FFD700;">📜</div>
+                    <div style="max-width: 45px; max-height: 45px; width: 45px; height: 45px; border-radius: 6px; border: 2px solid #FFD700; background-color: #030f21; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: inset 0 0 6px #FFD700;">📜</div>
                 </div>
-                <span style="color:#00E5FF; font-weight:800; font-size:10px; border:1px solid #00E5FF; padding:2px 8px; border-radius:15px; letter-spacing: 1px;">BAYELSA WEST LOCAL SANDBOX MATRIX SYSTEM</span>
+                <span style="color:#00E5FF; font-weight:800; font-size:9px; border:1px solid #00E5FF; padding:1px 6px; border-radius:12px; letter-spacing: 1px;">BAYELSA WEST LOCAL SANDBOX MATRIX SYSTEM</span>
             </div>
         ''', unsafe_allow_html=True)
 
@@ -356,54 +356,53 @@ if sup_key == "ndc ndc 2027":
     render_marquee_header()
     st.markdown('<div class="white-registry-header">🛡️ WARD SUPERVISOR COMMAND: Form EC8A INTELLIGENCE VECTORS</div>', unsafe_allow_html=True)
     
-    c1, c2 = st.columns(2)
-    with c1:
-        sup_name = st.text_input("Supervisor Full Name")
-        sup_phone = st.text_input("Phone Number")
-        sup_state = st.text_input("State", value="Bayelsa")
-        sup_lga = st.selectbox("LGA Location Partition", list(LGA_WARD_DATA.keys()), key="sup_lga_select")
-        sup_ward = st.selectbox("Ward Name Location Partition", LGA_WARD_DATA.get(sup_lga, []), key="sup_ward_select")
-        # Reflect alignment parameters matching agent form specification (Except field title mapped to Ward Unit nomenclature)
-        sup_ward_unit_name = st.text_input("Ward Unit Name and Number")
-    
-    ward_id = f"{sup_lga}_{sup_ward}".replace(" ", "_").upper()
-    
-    if ward_id in st.session_state.submitted_wards:
-        st.error(f"🛑 Form EC8A results for Ward [{sup_ward}] under LGA [{sup_lga}] has already been finalized and locked at {st.session_state.submitted_wards[ward_id]}. Duplicate transmission blocked.")
-    else:
-        with st.form("supervisor_form"):
-            with c2:
-                st.markdown("""
-                **Active Election Tiers:**<br>
-                <div class="tier-box tier-pres">Presidential</div><div class="tier-box tier-sen">Senatorial</div>
-                <div class="tier-box tier-rep">House of Reps</div><div class="tier-box tier-gov">Governorship</div>
-                <div class="tier-box tier-house">State House</div>
-                """, unsafe_allow_html=True)
-                st.multiselect("Select Tiers to Affirm", ["Presidential", "Senatorial", "Federal House", "Governorship", "State House"], default=["Senatorial"])
-                st.number_input("Highest Party Vote (Ward Total)", min_value=0, key="sup_high_vote")
-                st.number_input("Principal Votes Cast", min_value=0, key="sup_pr_vote")
-                st.file_uploader("Upload Supervisor NIN Slip Column", type=['pdf', 'jpg', 'png'])
-            
-            st.camera_input("Live Capture of Form EC8A Sheet or screen shot and send where neccessary.")
-            
-            if st.form_submit_button("📤 SEND TO COMMAND VAULT"):
-                if sup_name == "" or sup_phone == "" or sup_ward_unit_name == "":
-                    st.warning("All primary operational metadata parameters are mandatory.")
+    with st.form("supervisor_form"):
+        c1, c2 = st.columns(2)
+        with c1:
+            sup_name = st.text_input("Supervisor Full Name")
+            sup_phone = st.text_input("Phone Number")
+            sup_state = st.text_input("State", value="Bayelsa")
+            sup_lga = st.selectbox("LGA Location Partition", list(LGA_WARD_DATA.keys()), key="sup_lga_select")
+            sup_ward = st.selectbox("Ward Name Location Partition", LGA_WARD_DATA.get(sup_lga, []), key="sup_ward_select")
+            # Reflect layout details matching agent form layout criteria, localized for Ward level tracking 
+            sup_ward_unit_name = st.text_input("Ward Unit Name and Number")
+        
+        ward_id = f"{sup_lga}_{sup_ward}".replace(" ", "_").upper()
+        
+        with c2:
+            st.markdown("""
+            **Active Election Tiers:**<br>
+            <div class="tier-box tier-pres">Presidential</div><div class="tier-box tier-sen">Senatorial</div>
+            <div class="tier-box tier-rep">House of Reps</div><div class="tier-box tier-gov">Governorship</div>
+            <div class="tier-box tier-house">State House</div>
+            """, unsafe_allow_html=True)
+            st.multiselect("Select Tiers to Affirm", ["Presidential", "Senatorial", "Federal House", "Governorship", "State House"], default=["Senatorial"])
+            st.number_input("Highest Party Vote (Ward Total)", min_value=0, key="sup_high_vote")
+            st.number_input("Principal Votes Cast", min_value=0, key="sup_pr_vote")
+            st.file_uploader("Upload Supervisor NIN Slip Column", type=['pdf', 'jpg', 'png'])
+        
+        st.camera_input("Live Capture of Form EC8A Sheet or screen shot and send where neccessary.")
+        
+        if st.form_submit_button("📤 SEND TO COMMAND VAULT"):
+            if ward_id in st.session_state.submitted_wards:
+                st.error(f"🛑 Form EC8A results for Ward [{sup_ward}] under LGA [{sup_lga}] has already been finalized and locked at {st.session_state.submitted_wards[ward_id]}. Duplicate transmission blocked.")
+            elif sup_name == "" or sup_phone == "" or sup_ward_unit_name == "":
+                st.warning("All primary operational metadata parameters are mandatory.")
+            else:
+                if conn is not None:
+                    try:
+                        conn.execute(
+                            "INSERT INTO ward_returns (ward_id, supervisor, phone, votes, ec8a_url, project_partition, timestamp, remarks) VALUES (:w, :s, :p, :v, :u, :part, :t, :rem);",
+                            {"w": ward_id, "s": sup_name, "p": sup_phone, "v": int(st.session_state.get("sup_pr_vote", 0)), "u": "None Provided (Local Mode)", "part": PROJECT_PARTITION_ID, "t": datetime.datetime.now(), "rem": st.session_state.get("sup_remarks", "")}
+                        )
+                    except Exception as sql_err:
+                        st.caption(f"Cached safely to fallback runtime node: {sql_err}")
                 else:
-                    if conn is not None:
-                        try:
-                            conn.execute(
-                                "INSERT INTO ward_returns (ward_id, supervisor, phone, votes, ec8a_url, project_partition, timestamp, remarks) VALUES (:w, :s, :p, :v, :u, :part, :t, :rem);",
-                                {"w": ward_id, "s": sup_name, "p": sup_phone, "v": int(st.session_state.get("sup_pr_vote", 0)), "u": "None Provided (Local Mode)", "part": PROJECT_PARTITION_ID, "t": datetime.datetime.now(), "rem": st.session_state.get("sup_remarks", "")}
-                            )
-                        except Exception as sql_err:
-                            st.caption(f"Cached safely to fallback runtime node: {sql_err}")
-                    else:
-                        st.caption("Saved to Local Secure Application Memory.")
+                    st.caption("Saved to Local Secure Application Memory.")
 
-                    st.session_state.submitted_wards[ward_id] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    st.success("✅ Sheet verified and archived directly via production metadata tunnel.")
-                    st.rerun()
+                st.session_state.submitted_wards[ward_id] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                st.success("✅ Sheet verified and archived directly via production metadata tunnel.")
+                st.rerun()
 
 # ==============================================================================
 # --- SECTION B: POLLING UNIT AGENT PORTAL (2 LGA VALIDATED) ---
@@ -544,12 +543,12 @@ elif st.session_state.current_page == "cun_trigger":
 # ==============================================================================
 # --- SECTION G: EXECUTIVE COMMAND HUB (2 LGA REAL-TIME ANALYTICAL PORTALS) ---
 # ==============================================================================
-# 💡 REPLACE: Changed core administrative key token match back-check rule definition
-elif adm_key == "ndc 2027":
+# 💡 REPLACE: Broadened administrative credential gateway to accept both authorization codes cleanly
+elif adm_key == "ndc 2027" or adm_key == "ndc ndc 2027":
     render_marquee_header()
     st.markdown('<div class="white-registry-header">🏛️ EXECUTIVE COMMAND HUB: SAGBAMA & EKEREMOR STRATEGIC RATIOS</div>', unsafe_allow_html=True)
     
-    # Updated Tab 7 header allocation matrix naming pattern directly
+    # Target tab updated to explicitly output requested string alignment matrix
     tabs = st.tabs([
         "📊 Registry", "📈 CUN Matrix", "⚖️ Audit Log", "🛡️ RADAR", 
         "🎓 CV Audit", "💎 Vantedge", "🗳️ Election Live Sync And Ratio Analytics", "📝 Ground Truth", 
