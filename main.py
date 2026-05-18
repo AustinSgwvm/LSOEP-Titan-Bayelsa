@@ -170,6 +170,7 @@ if 'threat_msg' not in st.session_state:
     st.session_state.threat_msg = ""
 
 # --- REARRANGED LOCAL SANBOX MATRIX OVERRIDE (THE CIRCUIT BREAKER) ---
+# This checks if the app is local or live to protect the execution line.
 IS_LOCAL_SANDBOX = not os.path.exists("/app/secrets.toml") and not os.path.exists(".streamlit/secrets.toml")
 
 # --- HARDENED CIRCUIT BREAKER MATRIX ---
@@ -278,10 +279,12 @@ with st.sidebar:
     if st.session_state.radar_threat:
         st.markdown(f'<div class="radar-sticky-threat">🚨 SECURITY WARNING: IDENTITY DUPLICATION COLLISION<br>{st.session_state.threat_msg}</div>', unsafe_allow_html=True)
 
+    # 💡 REPLACE: "GCON COMMAND HUB KEY" to "COMMAND HUB KEY"
     st.markdown('<div class="admin-launch-zone">', unsafe_allow_html=True)
     adm_key = st.text_input("COMMAND HUB KEY", type="password", key="adm_v30_auth")
     st.markdown('</div>', unsafe_allow_html=True)
     
+    # 💡 REPLACE & ADD: Facebook URL link injected alongside active website asset tracking portal
     st.divider()
     st.markdown('<a href="https://www.facebook.com/IamHSDickson" target="_blank" class="inst-link-box">🌐 Senator HSD Facebook</a>', unsafe_allow_html=True)
     st.markdown('<a href="https://HSDickson.org" target="_blank" class="inst-link-box">🏛️ Senator HSD Web Portal</a>', unsafe_allow_html=True)
@@ -298,6 +301,7 @@ with st.sidebar:
     st.divider()
     if st.button("🏛️ RETURN TO COMMAND HUB", key="btn_cmd"): st.session_state.current_page = "main_dashboard"
 
+    # 💡 REPLACEMENTS AND AMENDMENTS: Keys set up with mandatory contextual remarks inputs
     st.divider()
     st.markdown("<p style='color:#FFD700; font-weight:bold; text-transform: uppercase; letter-spacing: 1px;'>Field Authentication</p>", unsafe_allow_html=True)
     sup_key = st.text_input("WARD SUPERVISOR KEY", type="password", key="sup_v30_auth")
@@ -316,6 +320,7 @@ def render_marquee_header():
         branding.render_header() 
         branding.render_marquee()
     else:
+        # Gateway Page Scale Adjustments: Portrait containers scaled downward cleanly to minimize screen real estate overflow
         st.markdown('''
             <div style="background: linear-gradient(180deg, #061a33 0%, #020b17 100%); padding: 12px 18px; border-radius: 16px; border: 3px solid #FFD700; text-align: center; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                 <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 2px;">
