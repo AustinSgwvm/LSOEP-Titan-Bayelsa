@@ -1,6 +1,6 @@
 # ==============================================================================
 # PROJECT: LSOEP TITAN BAYELSA - CORE ENGINE INTERFACE
-# REVISION: v34.0.28 [COMPREHENSIVE RUNTIME MATRIX - CHROMATIC RE-ALIGNMENT]
+# REVISION: v34.0.37 [COMPREHENSIVE RUNTIME MATRIX - CHROMATIC RE-ALIGNMENT]
 # ==============================================================================
 
 import streamlit as st
@@ -8,6 +8,7 @@ import pandas as pd
 import datetime
 import os
 import json
+import time
 
 # ==============================================================================
 # DATA ARCHITECTURE LAYER: TWO-LGA COMPLETE ADMINISTRATIVE MATRIX (NO OMISSIONS)
@@ -131,7 +132,66 @@ MOCK_DATA_REGISTRY = [
     }
 ]
 
-# Hardcoded Global Partition Stencil for Bayelsa West Strategic Ledger
+# ==============================================================================
+# MASTER NATIONAL ADMINISTRATIVE GEOGRAPHY VAULT (ALL 36 STATES + FCT)
+# ==============================================================================
+STATE_DATA_LEDGER = {
+    "Abia State": {"ABA NORTH": ["Eziama", "Industrial Area", "Osusu I", "Osusu II", "Uratta"], "ABA SOUTH": ["Aba River", "Aba Town Hall", "Enyimba", "Asa Triangle"], "OHAFIA": ["Ania", "Ohafor", "Ohafia Urban"], "UMUAHIA NORTH": ["Ibeku East I", "Ibeku East II", "Umuahia Urban I"]},
+    "Adamawa State": {"YOLA NORTH": ["Ajiya", "Gbadabiri", "Nassarowo", "Yolde Pate"], "YOLA SOUTH": ["Adarawo", "Bole Yolde", "Makama", "Mbamba"], "MUBI NORTH": ["Lokuwa", "Digil", "Yelwa"], "DEMSA": ["Demsa Moro", "Bille", "Gwamba"]},
+    "Akwa Ibom State": {"UYO": ["Uyo Urban I", "Uyo Urban II", "Etoi I", "Etoi II", "Offot I"], "EKET": ["Eket Urban I", "Eket Urban II", "Afaha Clan", "Okon Clan"], "IKOT EKPENE": ["Ikot Ekpene Urban I", "Ikot Ekpene Urban II", "Amayam"], "ORON": ["Oron Urban I", "Oron Urban II", "Oron Urban III"]},
+    "Anambra State": {"AWKA NORTH": ["Achalla I", "Achalla II", "Amansea", "Mgbakwu"], "AWKA SOUTH": ["Awka I", "Awka II", "Awka III", "Nise I", "Amawbia I"], "ONITSHA NORTH": ["American Quarters", "Inland Town I", "Inland Town II"], "NNEWI NORTH": ["Otolo", "Uruagu", "Umudim", "Nnewichi"]},
+    "Bauchi State": {"BAUCHI": ["Bakari Dukku", "Daniya", "Hardawa", "Makama Sarki"], "KATAGUM": ["Azare Federal", "Chinade", "Madangala"], "MISAU": ["Misau Town", "Gwaram", "Hardawa"], "ALKALERI": ["Alkaleri Ward", "Gwana", "Pali"]},
+    "Bayelsa State": {
+        "SAGBAMA": ["Sagbama Ward 1", "Salope Ward 2", "Asamabiri Ward 3", "Angalabiri Ward 4", "Ofoni Ward 5", "Ebedebiri Ward 6", "Ossiama Ward 7", "Agoro Ward 8", "Toruedeni Ward 9", "Adagbabiri Ward 10", "Ona Ward 11", "Agbere Ward 12", "Trofani Ward 13"],
+        "EKEREMOR": ["Ekeremor Ward 1", "Onyilolo Ward 2", "Ogbosuware Ward 3", "Ondewari Ward 4", "Isampou Ward 5", "Amabulou Ward 6", "Agge Ward 7", "Egbemo-Angalabiri Ward 8", "Onoledi Ward 9", "Angalaoweibiri Ward 10", "Peretorugbene Ward 11", "Ondewari Ward 12", "Eyinware Ward 13"],
+        "SOUTHERN IJAW": ["Oporoma Ward 1", "Onyoma Ward 2", "Boma Ward 3", "Olodiama Ward 4", "Amassoma Ward 5"],
+        "YENAGOA": ["Yenagoa Epie I", "Yenagoa Epie II", "Gbarain I", "Gbarain II", "Ekpetiama I"]
+    },
+    "Benue State": {"MAKURDI": ["Central Markets", "Clergy Ward", "Fiidi", "Wadata"], "GBOKO": ["Gboko Central", "Gboko East", "Yandev"], "OTUKPO": ["Otukpo Town East", "Otukpo Town West", "Adoka"], "VANDEIKYA": ["Vandeikya Township", "Mbaduku", "Tsambe"]},
+    "Borno State": {"MAIDUGURI": ["Bolori I", "Bolori II", "Shehuri North", "Shehuri South"], "BIU": ["Biu Central", "Miringa", "Zarawuyaku"], "JERE": ["Alau", "Bale Galtimari", "Maimusari"], "GWOZA": ["Gwoza Town", "Pulka", "Ashigashiya"]},
+    "Cross River State": {"CALABAR MUNICIPAL": ["Amanisong", "Big Qua", "Kasuk", "Ikot Ansa"], "AKAMKPA": ["Akamkpa Urban", "Erei", "Ojo"], "IKOM": ["Ikom Urban", "Olulumo", "Yala"], "OBUDU": ["Obudu Urban", "Bete", "Utanga"]},
+    "Delta State": {"WARRI SOUTH": ["Warri GRA", "Warri Central", "Warri Pesu", "Warri Okere"], "BOMADI": ["Akugbene", "Bomadi Town", "Esama"], "ASABA": ["Asaba Cable", "Umuaji", "West End"], "UGHELLI NORTH": ["Ughelli Urban I", "Ughelli Urban II", "Orogun I"]},
+    "Ebonyi State": {"ABAKALIKI": ["Azuiyiokwu", "Azuiyiator", "Abakiliki Town", "Kpirikpiri"], "AFIKPO": ["Afikpo Town", "Unwana I", "Unwana II"], "IZZIE": ["Izzi Urban", "Ezza Inyimagu", "Ndieze"], "OHAUKWU": ["Ezzamgbo", "Effium I", "Effium II"]},
+    "Edo State": {"OREDO": ["Oredo I", "Oredo II", "Ikpoba Hill", "New Benin"], "OVIA NORTH EAST": ["Adolor", "Ofunama", "Okada"], "ESAN CENTRAL": ["Irrua Urban", "Ewu Urban", "Opoji"], "ETSAKO WEST": ["Auchi Urban I", "Auchi Urban II", "Uzairue"]},
+    "Ekiti State": {"ADO EKITI": ["Ado I", "Ado II", "Ado III", "Okesha", "Irona"], "IKERE": ["Ikere Urban", "Odo Oja", "Ogbonjana"], "OMUO": ["Omuo Township", "Omuo East", "Kota"], "IKOLE": ["Ikole Urban", "Asin", "Odo Oro"]},
+    "Enugu State": {"ENUGU NORTH": ["Asata", "China Town", "Ogui New Layout"], "ENUGU SOUTH": ["Awkunanaw I", "Awkunanaw II", "Uwani"], "NSUKKA": ["Nsukka Urban", "Alor Uno", "Eha Alumona"], "UDI": ["Udi Town", "9th Mile", "Abor"]},
+    "FCT Abuja": {"AMAC": ["Garki", "Wuse", "Asokoro", "Maitama", "Nyanya", "Karu"], "GWAGWALADA": ["Gwagwalada Center", "Paiko", "Zuba"], "BWARI": ["Bwari Central", "Kubwa", "Ushafa"], "KUJE": ["Kuje Center", "Rubochi", "Gaube"]},
+    "Gombe State": {"GOMBE": ["Gombe East", "Gombe West", "Jekadafari", "Pantami"], "AKKO": ["Akko Town", "Kumo Central", "Pindiga"], "YAMALTU DEBA": ["Deba", "Zambuk", "Kano"], "BALANGA": ["Talasse", "Gelengu", "Chilung"]},
+    "Imo State": {"OWERRI MUNICIPAL": ["Owerri Urban I", "Owerri Urban II", "Aladinma"], "ORLU": ["Orlu Urban", "Amaifeke", "Omuma"], "OKIGWE": ["Okigwe Town", "Amuro", "Ezinachi"], "MBEISE": ["Ogbe", "Ekwereazu", "Ahiara"]},
+    "Jigawa State": {"DUTSE": ["Dutse Gari", "Kachi", "Limawa", "Madobi"], "HADEJIA": ["Hadejia Central", "Matsaro", "Sabon Garu"], "KAZAURE": ["Kazaure Gari", "Ba'auzini", "Dandi"], "GUMEL": ["Gumel Town", "Galgadi", "Hammado"]},
+    "Kaduna State": {"KADUNA NORTH": ["Dadi", "Kawo", "Gabassawa", "Unguwan Rimi"], "ZARIA": ["Zaria City", "Tudun Wada", "Samaru"], "KADUNA SOUTH": ["Tudun Wada West", "Barnawa", "Makera"], "KAFANCHAN": ["Kafanchan Urban", "Zikpak", "Garaje"]},
+    "Kano State": {"FAGGE": ["Fagge North", "Fagge South", "Kwaciri"], "NASSARAWA": ["Gwagwarwa", "Kano GRA", "Tudun Murtala"], "DALA": ["Dala Ward", "Gwangwazo", "Yakkaasai"], "GVALE": ["Gvale Town", "Galadanchi", "Mandawari"]},
+    "Katsina State": {"KATSINA": ["Katsina Central", "Wakilin Kebbi", "Yamma"], "FUNTUA": ["Funtua Central", "Maska", "Tudun Wada"], "DAURA": ["Daura Urban", "Madoba", "Sarki"], "MALUMFASHI": ["Malumfashi Town", "Yankara", "Dansarai"]},
+    "Kebbi State": {"BIRNIN KEBBI": ["Birnin Kebbi Central", "Nassarawa", "Gwadangaji"], "ARGUNGU": ["Argungu Central", "Felande"], "YURI": ["Yuri Town", "Genuwa", "Koko"], "ZURU": ["Zuru Town", "Dabai", "Rikoto"]},
+    "Kogi State": {"LOKOJA": ["Lokoja Core", "Adankolo", "Sarki Ward"], "OKENE": ["Okene Central", "Bariki", "Onyukoko"], "ANYIGBA": ["Anyigba Town", "Agbeji", "Ayingba Rural"], "KABBA": ["Kabba Town", "Asaya", "Okejumu"]},
+    "Kwara State": {"ILORIN WEST": ["Adewole", "Baboko", "Oloje", "Wara"], "ILORIN EAST": ["Gambari", "Oke Oyi", "Ipata"], "OFFA": ["Offa Township", "Balogun", "Essa"], "OMU ARAN": ["Omu Aran Core", "Ipetu", "Arandun"]},
+    "Lagos State": {"ALIMOSHO": ["Egbe-Idimu", "Ipaja", "Ikotun", "Gowon Estate"], "IKEJA": ["Ikeja GRA", "Anifowoshe", "Ojodu", "Oregun"], "SURULERE": ["Adeniran Ogunsanya", "Ojuelegba", "Aguda", "Ijesha"], "BADAGRY": ["Badagry Town", "Iworo", "Ajara"]},
+    "Nasarawa State": {"LAFIA": ["Lafia East", "Lafia Central", "Chiroma", "Makama"], "KEFFI": ["Keffi Central", "Yelwa", "Angwan Rimi"], "AKWANGA": ["Akwanga Town", "Gudi", "Mada"], "KARU": ["Mararaba", "Karu Urban", "Ado", "Nyanya Boundary"]},
+    "Niger State": {"CHANCHAGA": ["Minna Central", "Sabon Gari", "Tunga"], "BIDA": ["Bida Central", "Dokodza", "Masaga"], "SULEJA": ["Suleja Town", "Abuja Mandate", "Iku"], "KONTAGORA": ["Kontagora Town", "Usman", "Central"]},
+    "Ogun State": {"ABEOKUTA SOUTH": ["Ake I", "Ake II", "Imo Ward", "Lafenwa"], "IJEBU ODE": ["Ijebu Ode Central", "Ome Ward"], "SAGAMU": ["Sagamu Central", "Sabo", "Makun"], "OTA": ["Ota Urban", "Iju", "Sango"]},
+    "Ondo State": {"AKURE SOUTH": ["Akure Core", "Arakale", "Gbogi", "Isinkan"], "ONDO WEST": ["Ondo Core", "Yaba Ward"], "OWO": ["Owo Township", "Ehin Ogbe", "Igboroko"], "OKITIPUPA": ["Okitipupa Town", "Ikoya", "Ilutitun"]},
+    "Osun State": {"OSOGBO": ["Osogbo Central", "Ataoja I", "Ataoja II", "Alekuwodo"], "IFE CENTRAL": ["Ilare", "Iremo", "More Ward"], "ILESHA WEST": ["Ilesha Town", "Omofe", "Ereja"], "EDE SOUTH": ["Ede Town", "Babaruba", "Okejimi"]},
+    "Oyo State": {"IBADAN NORTH": ["Agodi", "Bodija", "Mokola", "Sabo"], "OYO WEST": ["Oyo Central", "Isokun", "Opapa"], "OGBOMOSO NORTH": ["Oja Igbo", "Sabon Gari", "Isale General"], "ISEYIN": ["Iseyin Town", "Okeho", "Ado Awaye"]},
+    "Plateau State": {"JOS NORTH": ["Jos Central", "Gangare", "Tafawa Balewa"], "JOS SOUTH": ["Bukuru", "Du Ward", "Gyel Ward"], "PANKSHIN": ["Pankshin Town", "Wokkos", "Fier"], "SHENDAM": ["Shendam Town", "Kalong", "Shimankar"]},
+    "Rivers State": {"PORT HARCOURT": ["PH I", "PH II", "Nkpolu Oroworukwo"], "OBIO-AKPOR": ["Rumueme", "Choba", "Elelenwo"], "BONNY": ["Bonny Town I", "Bonny Town II", "Finima"], "DEGEMA": ["Degema Urban", "Bakana", "Tombia"]},
+    "Sokoto State": {"SOKOTO NORTH": ["Sokoto Central", "Waziri Ward", "Rijiyar Zaki"], "WAMAKKO": ["Wamakko Town", "Gidan Bubu"], "TAMBUWAL": ["Tambuwal Town", "Dogon Daji", "Gidan Madi"], "GURONYO": ["Guronyo Town", "Rimawa", "Gada"]},
+    "Taraba State": {"JALINGO": ["Jalingo Central", "Turaki Ward", "Barade Ward"], "WUKARI": ["Wukari Central", "Avyi", "Hospital Ward"], "BALI": ["Bali Town", "Suntai", "Zaki"], "GASHAKA": ["Serti", "Barup", "Mayo Selbe"]},
+    "Yobe State": {"DAMATURU": ["Damaturu Central", "Maisandari", "Pawari"], "POTISKUM": ["Potiskum Central", "Bolewa"], "GASHUA": ["Gashua Town", "Bade", "Central"], "GEIDAM": ["Geidam Town", "Asheik", "Dele"]},
+    "Zamfara State": {"GUSAU": ["Gusau Central", "Galadima", "Mayana", "Subon Gari"], "KAURA NAMODA": ["Kaura Central", "Bangana"], "TFAFE": ["Tfafe Town", "Kazaure", "Yandoto"], "MARADUN": ["Maradun Town", "Dakai", "Gora"]}
+}
+
+# Calculated Static Projections for Cross-National Registration Ledgers
+NATIONAL_PRESIDENTIAL_LEDGERS = {k: {"Registered": 1200000 + (len(k) * 54321), "Turnout": 600000 + (len(k) * 21043), "Tally": 550000 + (len(k) * 19280)} for k in STATE_DATA_LEDGER.keys()}
+
+# --- GLOBALLY DEFINED PERFORMANCE MONITOR ZONE TO ELIMINATE NAMING CONFLICTS ---
+two_lga_performance_mock = pd.DataFrame({
+    "LGA Name": ["SAGBAMA", "EKEREMOR"],
+    "Performance Index": [84, 76],
+    "CUN Deficit Rate": [18, 29],
+    "Voter Turnout Metric": [81, 79],
+    "Waivers Distributed": [14, 9]
+}).set_index("LGA Name")
+
 PROJECT_PARTITION_ID = "BAYELSA_WEST"
 COLUMNS_STRUCTURE = [
     "NIN", "VIN", "Name", "LGA", "Ward", "Status", "Category", 
@@ -140,15 +200,13 @@ COLUMNS_STRUCTURE = [
     "Leader_Ward", "Leader_Portfolio", "Voucher_Code", "Remarks", "Timestamp"
 ]
 
-# --- PHYSICAL PERSISTENCE MATRIX PATH CONFIGURATIONS ---
 OFFLINE_REGISTRY_CACHE = "offline_registry_cache.csv"
 OFFLINE_METADATA_CACHE = "offline_metadata_cache.json"
 
 # ==============================================================================
-# MOBILE HARD DISK BACKGROUND AUTOSAVE AND ERROR EXTRACTION RECOVERY LOGIC
+# AUTOSAVE & SYSTEM STATE FAULT TOLERANCE RECOVERY RECONCILIATION
 # ==============================================================================
 def trigger_background_autosave():
-    """Forces immediate transactional write of memory states to internal device storage."""
     try:
         st.session_state.global_registry.to_csv(OFFLINE_REGISTRY_CACHE, index=False)
         meta_payload = {
@@ -161,7 +219,6 @@ def trigger_background_autosave():
         st.caption(f"Autosave sync bypass: {e}")
 
 def initialize_and_recover_system_states():
-    """Validates active application frames and automatically self-heals after device screen timeouts."""
     if 'global_registry' not in st.session_state:
         if os.path.exists(OFFLINE_REGISTRY_CACHE):
             try:
@@ -171,7 +228,7 @@ def initialize_and_recover_system_states():
         
         if 'global_registry' not in st.session_state:
             st.session_state.global_registry = pd.DataFrame([
-                {"NIN": "23456789012", "VIN": "90FVA2345678901", "Name": "Tari Ebiere", "LGA": "SAGBAMA", "Ward": "SAGBAMA WARD 1", "Status": "Verified", "Category": "Professional", "Skill_Interest": "ICT & AI", "Academic_Qual": "Degree/HND", "Admission_Year": "2024", "Admission_Letter": None, "Phone": "08039999999", "Leader_Name": "Chief Seriake", "Leader_Contact": "08038888888", "Leader_NIN": "33333333333", "Leader_LGA": "SAGBAMA", "Leader_Ward": "SAGBAMA WARD 1", "Leader_Portfolio": "Community Leader", "Voucher_Code": "SG01V", "Remarks": "Authentic", "Timestamp": "2026-05-15 10:00:00"},
+                {"NIN": "23456789012", "VIN": "90FVA2345678901", "Name": "Tari Ebiere", "LGA": "SAGBAMA", "Ward": "SAGBAMA WARD 1", "Status": "Verified", "Category": "Professional", "Skill_Interest": "ICT & AI", "Academic_Qual": "Degree/HND", "Admission_Year": "2024", "Admission_Letter": None, "Phone": "08039999999", "Leader_Name": "CHIEF SERIAKE", "Leader_Contact": "08038888888", "Leader_NIN": "33333333333", "Leader_LGA": "SAGBAMA", "Leader_Ward": "SAGBAMA WARD 1", "Leader_Portfolio": "Community Leader", "Voucher_Code": "SG01V", "Remarks": "Authentic", "Timestamp": "2026-05-15 10:00:00"},
                 {"NIN": "87654321098", "VIN": "90FVA8765432109", "Name": "Kemela Okponan", "LGA": "EKEREMOR", "Ward": "EKEREMOR WARD 1", "Status": "Flagged", "Category": "Skilled Artisan", "Skill_Interest": "Solar Power", "Academic_Qual": "SSCE", "Admission_Year": "2025", "Admission_Letter": None, "Phone": "08037777777", "Leader_Name": "Elder Pere", "Leader_Contact": "08036666666", "Leader_NIN": "44444444444", "Leader_LGA": "EKEREMOR", "Leader_Ward": "EKEREMOR WARD 1", "Leader_Portfolio": "Clergy", "Voucher_Code": "EK02V", "Remarks": "Verify Biometrics", "Timestamp": "2026-05-15 11:15:22"}
             ], columns=COLUMNS_STRUCTURE)
 
@@ -204,10 +261,8 @@ def initialize_and_recover_system_states():
     if 'recycle_bin_wards' not in st.session_state: st.session_state.recycle_bin_wards = {}
     if 'recycle_bin_pus' not in st.session_state: st.session_state.recycle_bin_pus = {}
 
-# Trigger automated self-heal sequence immediately on engine boot
 initialize_and_recover_system_states()
 
-# --- REARRANGED LOCAL SANBOX MATRIX OVERRIDE (THE CIRCUIT BREAKER) ---
 IS_LOCAL_SANDBOX = not os.path.exists("/app/secrets.toml") and not os.path.exists(".streamlit/secrets.toml")
 
 conn = None
@@ -218,10 +273,10 @@ if not IS_LOCAL_SANDBOX:
         conn = None
 
 # ==============================================================================
-# UI INITIALIZATION & CONFIGURATION WITH ADVANCED ANIMATION LEDGERS
+# SCREEN FRAME CONFIGURATION & SIDEBAR INTERFACE ENGINES
 # ==============================================================================
 st.set_page_config(
-    page_title="LSOEP TITAN BAYELSA | SEN. DICKSON HUB", 
+    page_title="LSOEP TITAN BAYELSA | SEN. HENRY HUB", 
     page_icon="🏛️",
     layout="wide", 
     initial_sidebar_state="expanded"
@@ -236,9 +291,8 @@ except ImportError:
 if HAS_MODULES:
     branding.apply_regal_styles()
 
-# ==============================================================================
-# --- THREE-TIER HARDENED SIDEBAR & INTEGRATED ANIMATION STYLE MODULES ---
-# ==============================================================================
+cache_breaker = int(time.time())
+
 with st.sidebar:
     st.markdown("""
         <style>
@@ -273,37 +327,6 @@ with st.sidebar:
         button[key="btn_cv"] { background: linear-gradient(90deg, #8E2DE2 0%, #4A00E0 100%) !important; }
         button[key="btn_cmd"] { background: #0b1e36 !important; border: 2px solid #00E5FF !important; }
 
-        @keyframes dynamic_fade_sequence {
-            0% { opacity: 0.1; transform: scale(0.96); filter: drop-shadow(0 0 4px #00E5FF); }
-            50% { opacity: 1.0; transform: scale(1.02); filter: drop-shadow(0 0 22px #8B0000); }
-            100% { opacity: 0.1; transform: scale(0.96); filter: drop-shadow(0 0 4px #00E5FF); }
-        }
-        
-        @keyframes dynamic_square_chroma {
-            0% { border-color: #8B0000; box-shadow: 0 0 12px #8B0000; }
-            25% { border-color: #020b17; box-shadow: 0 0 18px #020b17; }
-            50% { border-color: #38ef7d; box-shadow: 0 0 12px #38ef7d; }
-            75% { border-color: #FF4B4B; box-shadow: 0 0 18px #FF4B4B; }
-            100% { border-color: #8B0000; box-shadow: 0 0 12px #8B0000; }
-        }
-
-        .senate-img-box {
-            animation: dynamic_fade_sequence 6s infinite ease-in-out;
-            border: 4px solid #020b17;
-            animation-name: dynamic_fade_sequence, dynamic_square_chroma;
-            animation-duration: 6s, 8s;
-            animation-iteration-count: infinite, infinite;
-            animation-timing-function: ease-in-out, linear;
-            padding: 8px; 
-            border-radius: 12px; 
-            max-width: 170px; 
-            height: auto; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            background-color: #020b17;
-        }
-        
         @keyframes alert_pulse { 
             0% { background-color: #FF1744; box-shadow: 0 0 10px #FF1744; } 
             50% { background-color: #B71C1C; box-shadow: 0 0 25px #FF1744; } 
@@ -372,14 +395,12 @@ with st.sidebar:
     st.divider()
     if st.button("🏛️ RETURN TO COMMAND HUB", key="btn_cmd"): st.session_state.current_page = "main_dashboard"
 
-    # --- SHIFTED DOWN DOWN IN THE SIDEBAR AS DIRECTED ---
     st.divider()
     st.markdown("<p style='color:#8B0000; font-weight:bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 100px;'>🔒 Field Authentication Core</p>", unsafe_allow_html=True)
     
     sup_key_input = st.text_input("WARD SUPERVISOR KEY", type="password", key="sup_v30_auth_sidebar")
     agt_key_input = st.text_input("POLLING UNIT AGENT KEY", type="password", key="agt_v30_auth_sidebar")
 
-    # Centralized Role Page Routing evaluation checks
     if adm_key in ["ndc 2027", "ndc ndc 2027"]:
         st.session_state.current_page = "main_dashboard"
     elif sup_key_input == "ndc ndc 2027":
@@ -392,9 +413,11 @@ with st.sidebar:
     if agt_key_input:
         st.text_area("Agent Remarks/Field Observations", key="agt_remarks", placeholder="Enter unit authorization notes/field log...")
         
-    st.caption(f"Engine: v34.0.28-BAYELSA | {datetime.date.today()}")
+    st.caption(f"Engine: v34.0.37-BAYELSA | {datetime.date.today()}")
 
-# 4. COMMAND ROUTING & AUTO-DATA LOGIC
+# ==============================================================================
+# CHROMATIC HEADER RENDERING SUITE (NATIVE FLEXBOX BLUEPRINT)
+# ==============================================================================
 def render_marquee_header():
     if HAS_MODULES:
         branding.render_header() 
@@ -406,26 +429,137 @@ def render_marquee_header():
             </div>
         ''', unsafe_allow_html=True)
     else:
-        st.markdown('''
-            <div style="background: linear-gradient(180deg, #061a33 0%, #020b17 100%); padding: 12px 18px; border-radius: 16px; border: none; text-align: center; margin-bottom:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 2px; flex-wrap: wrap;">
-                    <div class="senate-img-box">
-                        <img src="bayelsa_icon.png" style="width: 140px; height: auto; border-radius: 6px;">
-                    </div>
-                    <div style="text-align: center; min-width: 260px;">
-                        <h1 style="color:#8B0000; margin:0; font-size:1.7rem; font-weight:900; letter-spacing: 1px; text-transform: uppercase;">SENATOR HENRY SERIAKE DICKSON</h1>
-                    </div>
-                    <div style="max-width: 45px; max-height: 45px; width: 45px; height: 45px; border-radius: 6px; border: 2px solid #8B0000; background-color: #030f21; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: inset 0 0 6px #8B0000;">📜</div>
+        st.markdown(f'''
+            <style>
+            .fixed-premium-header {{
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: stretch !important; 
+                justify-content: space-between !important;
+                width: 100% !important;
+                height: 195px !important;
+                background: linear-gradient(135deg, #061a33 0%, #020b17 100%) !important;
+                border: 4px solid #8B0000 !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+                border-radius: 16px !important;
+                margin-bottom: 15px !important;
+                overflow: hidden !important; 
+                padding: 0 !important;
+            }}
+
+            .fixed-mace-shield {{
+                flex-shrink: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 140px !important;
+                background: rgba(3, 15, 33, 0.5) !important;
+                margin: 0 !important;
+                padding: 10px !important;
+            }}
+
+            .fixed-mace-shield img {{
+                max-height: 130px !important;
+                width: auto !important;
+                object-fit: contain !important;
+            }}
+
+            .fixed-text-shield {{
+                flex-grow: 1 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                text-align: center !important;
+                padding: 0 20px !important;
+                margin: 0 !important;
+            }}
+
+            .fixed-text-shield h1 {{
+                color: #8B0000 !important;
+                margin: 0 !important;
+                font-size: 1.7rem !important;
+                font-weight: 900 !important;
+                letter-spacing: 1.5px !important;
+                text-transform: uppercase !important;
+                line-height: 1.2 !important;
+            }}
+
+            .fixed-text-shield h2 {{
+                color: #FFFFFF !important;
+                margin: 6px 0 0 0 !important;
+                font-size: 0.95rem !important;
+                font-weight: 700 !important;
+                letter-spacing: 1px !important;
+                text-transform: uppercase !important;
+                line-height: 1.2 !important;
+            }}
+
+            .fixed-photo-shield {{
+                flex-shrink: 0 !important;
+                width: 320px !important; 
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
+            }}
+
+            .fixed-photo-shield img {{
+                display: block !important;
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                object-position: center top !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border-left: 2px solid rgba(139, 0, 0, 0.4) !important;
+            }}
+
+            @media (max-width: 840px) {{
+                .fixed-premium-header {{
+                    flex-direction: column !important;
+                    height: auto !important;
+                }}
+                .fixed-mace-shield {{
+                    width: 100% !important;
+                    height: 90px !important;
+                    background: transparent !important;
+                }}
+                .fixed-text-shield {{
+                    padding: 15px !important;
+                }}
+                .fixed-text-shield h1 {{ font-size: 1.3rem !important; }}
+                .fixed-text-shield h2 {{ font-size: 0.8rem !important; }}
+                .fixed-photo-shield {{
+                    width: 100% !important;
+                    height: 200px !important;
+                }}
+                .fixed-photo-shield img {{
+                    border-left: none !important;
+                    border-top: 2px solid rgba(139, 0, 0, 0.4) !important;
+                }}
+            }}
+            </style>
+
+            <div class="fixed-premium-header" id="header_runtime_node_{cache_breaker}">
+                <div class="fixed-mace-shield">
+                    <img src="https://raw.githubusercontent.com/AustinSgwvm/lsoep-titan-kaduna/main/assets/mace.png">
                 </div>
-                <div style="margin-top: 8px; background: linear-gradient(180deg, #061a33 0%, #020b17 100%); padding: 6px; border-radius: 8px; border: none;">
-                    <marquee scrollamount="4" style="color:#FFFFFF; font-weight:800; font-size:12px; letter-spacing: 1px; font-family: monospace;">
-                        ⚡ NDC NIGERIA DEMOCRATIC CONGRESS (NDC) IS HERE TO LEAD AND SERVE THE PEOPLE..... NDC NIGERIA DEMOCRATIC CONGRESS (NDC) IS HERE TO LEAD AND SERVE THE PEOPLE..... ⚡
-                    </marquee>
+                <div class="fixed-text-shield">
+                    <h1>SENATOR HENRY SERIAKE DICKSON</h1>
+                    <h2>MEMBER REPRESENTING BAYELSA WEST SENATORIAL DISTRICT</h2>
                 </div>
+                <div class="fixed-photo-shield">
+                    <img src="https://raw.githubusercontent.com/AustinSgwvm/lsoep-titan-kaduna/main/assets/soba_icon.png?v={cache_breaker}">
+                </div>
+            </div>
+            
+            <div style="margin-top: 8px; background: linear-gradient(180deg, #061a33 0%, #020b17 100%); padding: 6px; border-radius: 8px; border: none; margin-bottom: 15px;">
+                <marquee scrollamount="4" style="color:#FFFFFF; font-weight:800; font-size:12px; letter-spacing: 1px; font-family: monospace;">
+                    ⚡ NDC NIGERIA DEMOCRATIC CONGRESS (NDC) IS HERE TO LEAD AND SERVE THE PEOPLE..... NDC NIGERIA DEMOCRATIC CONGRESS (NDC) IS HERE TO LEAD AND SERVE THE PEOPLE..... ⚡
+                </marquee>
             </div>
         ''', unsafe_allow_html=True)
 
-# --- REUSABLE UTILITY FUNCTION TO RENDER DATA PURGE MECHANIC ON ALL MODULES ---
 def render_institutional_purge_engine(key_suffix, render_recovery_gate=False):
     st.markdown("---")
     st.subheader("🚨 Institutional Data Purge Zone")
@@ -443,7 +577,6 @@ def render_institutional_purge_engine(key_suffix, render_recovery_gate=False):
                     st.session_state.global_registry = st.session_state.recycle_bin_registry.copy()
                     st.session_state.submitted_wards = st.session_state.recycle_bin_wards.copy()
                     st.session_state.submitted_pus = st.session_state.recycle_bin_pus.copy()
-                    
                     st.session_state.recycle_bin_registry = None
                     st.session_state.recycle_bin_wards = {}
                     st.session_state.recycle_bin_pus = {}
@@ -458,7 +591,6 @@ def render_institutional_purge_engine(key_suffix, render_recovery_gate=False):
             st.session_state.recycle_bin_registry = st.session_state.global_registry.copy()
             st.session_state.recycle_bin_wards = st.session_state.submitted_wards.copy()
             st.session_state.recycle_bin_pus = st.session_state.submitted_pus.copy()
-            
             st.session_state.global_registry = pd.DataFrame(columns=COLUMNS_STRUCTURE)
             st.session_state.submitted_wards = {}
             st.session_state.submitted_pus = {}
@@ -466,7 +598,6 @@ def render_institutional_purge_engine(key_suffix, render_recovery_gate=False):
             st.success("💥 System data wiped! Data cached to local session Recycle Bin for unforeseen recovery emergencies.")
             st.rerun()
 
-# --- REUSABLE DOWNLOAD ENGINE UTILITY TO CREATE DATA LOG EXTRACTION POINTS ---
 def render_module_download_trigger(data_source, filename_prefix, unique_key):
     try:
         if isinstance(data_source, pd.DataFrame):
@@ -487,7 +618,7 @@ def render_module_download_trigger(data_source, filename_prefix, unique_key):
         st.caption(f"Download pipeline initializing: {e}")
 
 # ==============================================================================
-# --- MAIN APPLICATION ROUTING GATEWAY CONTROLLER ---
+# INTERFACE ROUTING ENGINE MATRIX CONTROL
 # ==============================================================================
 
 # --- ROUTING NODE 1: WARD SUPERVISOR COMMAND PANEL ---
@@ -655,14 +786,6 @@ elif st.session_state.current_page == "main_dashboard":
         "📂 Bulk Sync", "📜 Waiver", "🚀 Bills Matrix", "📅 MONITORING"
     ])
     
-    two_lga_performance_mock = pd.DataFrame({
-        "LGA Name": ["SAGBAMA", "EKEREMOR"],
-        "Performance Index": [84, 76],
-        "CUN Deficit Rate": [18, 29],
-        "Voter Turnout Metric": [81, 79],
-        "Waivers Distributed": [14, 9]
-    }).set_index("LGA Name")
-    
     # --- 1. MASTER REGISTRY ENGINE ---
     with tabs[0]:
         st.subheader("Master Verification Registry Partition System Node")
@@ -687,7 +810,6 @@ elif st.session_state.current_page == "main_dashboard":
                     st.session_state.global_registry = st.session_state.recycle_bin_registry.copy()
                     st.session_state.submitted_wards = st.session_state.recycle_bin_wards.copy()
                     st.session_state.submitted_pus = st.session_state.recycle_bin_pus.copy()
-                    
                     st.session_state.recycle_bin_registry = None
                     st.session_state.recycle_bin_wards = {}
                     st.session_state.recycle_bin_pus = {}
@@ -823,59 +945,18 @@ elif st.session_state.current_page == "main_dashboard":
     # --- 7. ELECTION SYNC WAR ROOM & LIVE NATIONAL SCOOP ENGINES ---
     with tabs[6]:
         st.subheader("🗳️ Election Live Sync And Ratio Analytics Hub")
-        
-        national_presidential_state_ledgers = {
-            "Abia State": {"Registered": 2120000, "Turnout": 381000, "Tally": 361200},
-            "Adamawa State": {"Registered": 2190000, "Turnout": 763000, "Tally": 731500},
-            "Akwa Ibom State": {"Registered": 2350000, "Turnout": 591000, "Tally": 562400},
-            "Anambra State": {"Registered": 2620000, "Turnout": 621000, "Tally": 598100},
-            "Bauchi State": {"Registered": 2740000, "Turnout": 890000, "Tally": 855200},
-            "Bayelsa State": {"Registered": 1050000, "Turnout": 485900, "Tally": 461300},
-            "Benue State": {"Registered": 2770000, "Turnout": 804000, "Tally": 769400},
-            "Borno State": {"Registered": 2510000, "Turnout": 712000, "Tally": 681300},
-            "Cross River State": {"Registered": 1760000, "Turnout": 441000, "Tally": 419500},
-            "Delta State": {"Registered": 3220000, "Turnout": 691000, "Tally": 662500},
-            "Ebonyi State": {"Registered": 1590000, "Turnout": 341000, "Tally": 322100},
-            "Edo State": {"Registered": 2500000, "Turnout": 612000, "Tally": 581900},
-            "Ekiti State": {"Registered": 988000, "Turnout": 315000, "Tally": 301200},
-            "Enugu State": {"Registered": 2110000, "Turnout": 482000, "Tally": 461500},
-            "FCT Abuja": {"Registered": 1570000, "Turnout": 412500, "Tally": 394200},
-            "Gombe State": {"Registered": 1560000, "Turnout": 541000, "Tally": 519200},
-            "Imo State": {"Registered": 2410000, "Turnout": 511000, "Tally": 489400},
-            "Jigawa State": {"Registered": 2350000, "Turnout": 961000, "Tally": 929500},
-            "Kaduna State": {"Registered": 4330000, "Turnout": 1412000, "Tally": 1361400},
-            "Kano State": {"Registered": 5920000, "Turnout": 1761000, "Tally": 1702100},
-            "Katsina State": {"Registered": 3510000, "Turnout": 1102000, "Tally": 1061900},
-            "Kebbi State": {"Registered": 2030000, "Turnout": 781000, "Tally": 749500},
-            "Kogi State": {"Registered": 1930000, "Turnout": 615000, "Tally": 591200},
-            "Kwara State": {"Registered": 1690000, "Turnout": 491000, "Tally": 472400},
-            "Lagos State": {"Registered": 7060000, "Turnout": 1341000, "Tally": 1295200},
-            "Nasarawa State": {"Registered": 1890000, "Turnout": 561000, "Tally": 541300},
-            "Niger State": {"Registered": 2690000, "Turnout": 821000, "Tally": 789400},
-            "Ogun State": {"Registered": 2680000, "Turnout": 621000, "Tally": 594100},
-            "Ondo State": {"Registered": 1990000, "Turnout": 571000, "Tally": 549500},
-            "Osun State": {"Registered": 1950000, "Turnout": 764000, "Tally": 731200},
-            "Oyo State": {"Registered": 3270000, "Turnout": 861000, "Tally": 829500},
-            "Plateau State": {"Registered": 2780000, "Turnout": 1112000, "Tally": 1071400},
-            "Rivers State": {"Registered": 3530000, "Turnout": 612400, "Tally": 589100},
-            "Sokoto State": {"Registered": 791000, "Turnout": 791000, "Tally": 761300},
-            "Taraba State": {"Registered": 2020000, "Turnout": 531000, "Tally": 508400},
-            "Yobe State": {"Registered": 1480000, "Turnout": 412000, "Tally": 395100},
-            "Zamfara State": {"Registered": 1920000, "Turnout": 518000, "Tally": 499200}
-        }
-        
         st.markdown("#### 🔍 Real-Time Cross-National Identity Matrix Tracker")
         search_state_input = st.text_input("Type State Name to fetch absolute figures instantly (e.g., 'Bayelsa State', 'Lagos State'):", key="national_search_box_sync").strip()
         
         if search_state_input:
             matched_state = None
-            for key in national_presidential_state_ledgers.keys():
+            for key in NATIONAL_PRESIDENTIAL_LEDGERS.keys():
                 if search_state_input.lower() == key.lower():
                     matched_state = key
                     break
                     
             if matched_state:
-                state_stats = national_presidential_state_ledgers[matched_state]
+                state_stats = NATIONAL_PRESIDENTIAL_LEDGERS[matched_state]
                 st.success(f"📊 **{matched_state} Core Operational Index Extracted:**")
                 sc1, sc2, sc3 = st.columns(3)
                 sc1.metric("INEC Registered Voters", f"{state_stats['Registered']:,} Profiles")
@@ -886,7 +967,7 @@ elif st.session_state.current_page == "main_dashboard":
         
         st.markdown(f"""
         **Election Level Colour Configurations Stamped In Ledger:**
-        * <div class="tier-box tier-pres" style="width:100%; text-align:left;">🔴 Presidential Tally Column &mdash; <b style="font-size:16px; float:right;">{sum(x['Tally'] for x in national_presidential_state_ledgers.values()):,} Total National Votes</b></div>
+        * <div class="tier-box tier-pres" style="width:100%; text-align:left;">🔴 Presidential Tally Column &mdash; <b style="font-size:16px; float:right;">{sum(x['Tally'] for x in NATIONAL_PRESIDENTIAL_LEDGERS.values()):,} Total National Votes</b></div>
         * <div class="tier-box tier-sen" style="width:100%; text-align:left;">🔵 Senatorial Tally Column &mdash; <b style="font-size:16px; float:right;">24,815,402 Total Valid Ballots</b></div>
         * <div class="tier-box tier-rep" style="width:100%; text-align:left;">🟢 House of Reps Tally Column &mdash; <b style="font-size:16px; float:right;">23,942,108 Total Valid Ballots</b></div>
         * <div class="tier-box tier-gov" style="width:100%; text-align:left;">🟣 Governorship Tally Column &mdash; <b style="font-size:16px; float:right;">19,652,440 Total Valid Ballots</b></div>
@@ -896,58 +977,13 @@ elif st.session_state.current_page == "main_dashboard":
         st.divider()
         st.markdown("### 📡 Live National Results Scoop Interface")
         
-        national_inec_matrix = {
-            "Abia State": {"ABA NORTH": ["Eziama", "Industrial Area", "Osusu I", "Osusu II", "Uratta"], "ABA SOUTH": ["Aba River", "Aba Town Hall", "Enyimba", "Asa Triangle"]},
-            "Adamawa State": {"YOLA NORTH": ["Ajiya", "Gbadabiri", "Nassarowo", "Yolde Pate"], "YOLA SOUTH": ["Adarawo", "Bole Yolde", "Makama", "Mbamba"]},
-            "Akwa Ibom State": {"UYO": ["Uyo Urban I", "Uyo Urban II", "Etoi I", "Etoi II", "Offot I"], "EKET": ["Eket Urban I", "Eket Urban II", "Afaha Clan", "Okon Clan"]},
-            "Anambra State": {"AWKA NORTH": ["Achalla I", "Achalla II", "Amansea", "Mgbakwu"], "AWKA SOUTH": ["Awka I", "Awka II", "Awka III", "Nise I", "Amawbia I"]},
-            "Bauchi State": {"BAUCHI": ["Bakari Dukku", "Daniya", "Hardawa", "Makama Sarki"], "KATAGUM": ["Azare Federal", "Chinade", "Madangala"]},
-            "Bayelsa State": {
-                "SAGBAMA": ["Sagbama Ward 1", "Salope Ward 2", "Asamabiri Ward 3", "Angalabiri Ward 4", "Ofoni Ward 5", "Ebedebiri Ward 6", "Ossiama Ward 7", "Agoro Ward 8", "Toruedeni Ward 9", "Adagbabiri Ward 10", "Ona Ward 11", "Agbere Ward 12", "Trofani Ward 13"],
-                "EKEREMOR": ["Ekeremor Ward 1", "Onyilolo Ward 2", "Ogbosuware Ward 3", "Ondewari Ward 4", "Isampou Ward 5", "Amabulou Ward 6", "Agge Ward 7", "Egbemo-Angalabiri Ward 8", "Onoledi Ward 9", "Angalaoweibiri Ward 10", "Peretorugbene Ward 11", "Ondewari Ward 12", "Eyinware Ward 13"],
-                "SOUTHERN IJAW": ["Oporoma Ward 1", "Onyoma Ward 2", "Boma Ward 3", "Olodiama Ward 4", "Amassoma Ward 5"],
-                "YENAGOA": ["Yenagoa Epie I", "Yenagoa Epie II", "Gbarain I", "Gbarain II", "Ekpetiama I"]
-            },
-            "Benue State": {"MAKURDI": ["Central Markets", "Clergy Ward", "Fiidi", "Wadata"], "GBOKO": ["Gboko Central", "Gboko East", "Yandev"]},
-            "Borno State": {"MAIDUGURI": ["Bolori I", "Bolori II", "Shehuri North", "Shehuri South"], "BIU": ["Biu Central", "Miringa", "Zarawuyaku"]},
-            "Cross River State": {"CALABAR MUNICIPAL": ["Amanisong", "Big Qua", "Kasuk", "Ikot Ansa"], "AKAMKPA": ["Akamkpa Urban", "Erei", "Ojo"]},
-            "Delta State": {"WARRI SOUTH": ["Warri GRA", "Warri Central", "Warri Pesu", "Warri Okere"], "BOMADI": ["Akugbene", "Bomadi Town", "Esama"]},
-            "Ebonyi State": {"ABAKALIKI": ["Azuiyiokwu", "Azuiyiator", "Abakiliki Town", "Kpirikpiri"], "AFIKPO": ["Afikpo Town", "Unwana I", "Unwana II"]},
-            "Edo State": {"OREDO": ["Oredo I", "Oredo II", "Ikpoba Hill", "New Benin"], "OVIA NORTH EAST": ["Adolor", "Ofunama", "Okada"]},
-            "Ekiti State": {"ADO EKITI": ["Ado I", "Ado II", "Ado III", "Okesha", "Irona"], "IKERE": ["Ikere Urban", "Odo Oja", "Ogbonjana"]},
-            "Enugu State": {"ENUGU NORTH": ["Asata", "China Town", "Ogui New Layout"], "ENUGU SOUTH": ["Awkunanaw I", "Awkunanaw II", "Uwani"]},
-            "FCT Abuja": {"AMAC": ["Garki", "Wuse", "Asokoro", "Maitama", "Nyanya", "Karue"], "GWAGWALADA": ["Gwagwalada Center", "Paiko", "Zuba"]},
-            "Gombe State": {"GOMBE": ["Gombe East", "Gombe West", "Jekadafari", "Pantami"], "AKKO": ["Akko Town", "Kumo Central", "Pindiga"]},
-            "Imo State": {"OWERRI MUNICIPAL": ["Owerri Urban I", "Owerri Urban II", "Aladinma"], "ORLU": ["Orlu Urban", "Amaifeke", "Omuma"]},
-            "Jigawa State": {"DUTSE": ["Dutse Gari", "Kachi", "Limawa", "Madobi"], "HAUJA": ["Hadejia Central", "Matsaro", "Sabon Garu"]},
-            "Kaduna State": {"KADUNA NORTH": ["Dadi", "Kawo", "Gabassawa", "Unguwan Rimi"], "ZARIA": ["Zaria City", "Tudun Wada", "Samaru"]},
-            "Kano State": {"FAGGE": ["Fagge North", "Fagge South", "Kwaciri"], "NASSARAWA": ["Gwagwarwa", "Kano GRA", "Tudun Murtala"]},
-            "Katsina State": {"KATSINA": ["Katsina Central", "Wakilin Kebbi", "Yamma"], "FUNTUA": ["Funtua Central", "Maska", "Tudun Wada"]},
-            "Kebbi State": {"BIRNIN KEBBI": ["Birnin Kebbi Central", "Nassarawa", "Gwadangaji"], "ARGUNGU": ["Argungu Central", "Felande"]},
-            "Kogi State": {"LOKOJA": ["Lokoja Core", "Adankolo", "Sarki Ward"], "OKENE": ["Okene Central", "Bariki", "Onyukoko"]},
-            "Kwara State": {"ILORIN WEST": ["Adewole", "Baboko", "Oloje", "Wara"], "ILORIN EAST": ["Gambari", "Oke Oyi", "Ipata"]},
-            "Lagos State": {"ALIMOSHO": ["Egbe-Idimu", "Ipaja", "Ikotun", "Gowon Estate"], "IKEJA": ["Ikeja GRA", "Anifowoshe", "Ojodu", "Oregun"]},
-            "Nasarawa State": {"LAFIA": ["Lafia East", "Lafia Central", "Chiroma", "Makama"], "KEFFI": ["Keffi Central", "Yelwa", "Angwan Rimi"]},
-            "Niger State": {"CHANCHAGA": ["Minna Central", "Sabon Gari", "Tunga"], "BIDA": ["Bida Central", "Dokodza", "Masaga"]},
-            "Ogun State": {"ABEOKUTA SOUTH": ["Ake I", "Ake II", "Imo Ward", "Lafenwa"], "IJEBU ODE": ["Ijebu Ode Central", "Ome Ward"]},
-            "Ondo State": {"AKURE SOUTH": ["Akure Core", "Arakale", "Gbogi", "Isinkan"], "ONDO WEST": ["Ondo Core", "Yaba Ward"]},
-            "Osun State": {"OSOGBO": ["Osogbo Central", "Ataoja I", "Ataoja II", "Alekuwodo"], "IFE CENTRAL": ["Ilare", "Iremo", "More Ward"]},
-            "Oyo State": {"IBADAN NORTH": ["Agodi", "Bodija", "Mokola", "Sabo"], "OYO WEST": ["Oyo Central", "Isokun", "Opapa"]},
-            "Plateau State": {"JOS NORTH": ["Jos Central", "Gangare", "Tafawa Balewa"], "JOS SOUTH": ["Bukuru", "Du Ward", "Gyel Ward"]},
-            "Rivers State": {"PORT HARCOURT": ["PH I", "PH II", "Nkpolu Oroworukwo"], "OBIO-AKPOR": ["Rumueme", "Choba", "Elelenwo"]},
-            "Sokoto State": {"SOKOTO NORTH": ["Sokoto Central", "Waziri Ward", "Rijiyar Zaki"], "WAMAKKO": ["Wamakko Town", "Gidan Bubu"]},
-            "Taraba State": {"JALINGO": ["Jalingo Central", "Turaki Ward", "Barade Ward"], "WUKARI": ["Wukari Central", "Avyi", "Hospital Ward"]},
-            "Yobe State": {"DAMATURU": ["Damaturu Central", "Maisandari", "Pawari"], "POTISKUM": ["Potiskum Central", "Bolewa"]},
-            "Zamfara State": {"GUSAU": ["Gusau Central", "Galadima", "Mayana", "Sabon Gari"], "KAURA NAMODA": ["Kaura Central", "Bangana"]}
-        }
-        
-        target_state_scoop = st.selectbox("Select Target State Node to Scoop Results", list(national_inec_matrix.keys()), key="sync_state_scoop_select")
+        target_state_scoop = st.selectbox("Select Target State Node to Scoop Results", list(STATE_DATA_LEDGER.keys()), key="sync_state_scoop_select")
         
         if st.button("⚡ EXECUTE AUTOMATIC NATIONAL DATA SCOOP", key="btn_trigger_scoop_votes"):
             st.success(f"🎉 Secure connection tunneled directly to Live National Server Network Node. Cascading INEC Wards automatically...")
             
             scoop_records = []
-            selected_state_data = national_inec_matrix[target_state_scoop]
+            selected_state_data = STATE_DATA_LEDGER[target_state_scoop]
             
             for lga_name, wards_list in selected_state_data.items():
                 for ward_name in wards_list:
@@ -974,25 +1010,19 @@ elif st.session_state.current_page == "main_dashboard":
             
         render_institutional_purge_engine(key_suffix="election_t6", render_recovery_gate=False)
 
-    # --- 8. GROUND TRUTH VALIDATOR (FULLY CONFIGURABLE STATE MAPPING & MATRIX GENERATION) ---
+    # --- 8. GROUND TRUTH VALIDATOR (FIXED AND LINKED PERMANENTLY TO THE MASTER VAULT) ---
     with tabs[7]:
         st.subheader("📝 Ground Truth Form EC8A Document Integrity Ratios")
         st.markdown("**The Heart of the Elections:** Real-time physical audited returns verification schema node mapped from Polling Units.")
         
-        target_state_ec8a = st.selectbox("Select Target State Node to Scoop Form EC8A Logs", ["Bayelsa State", "Rivers State", "Delta State", "Akwa Ibom State"], key="ec8a_state_scoop_select")
+        target_state_ec8a = st.selectbox("Select Target State Node to Scoop Form EC8A Logs", list(STATE_DATA_LEDGER.keys()), key="ec8a_state_scoop_select")
         
-        if target_state_ec8a == "Bayelsa State":
-            lga_options = ["Sagbama", "Ekeremor", "Southern Ijaw", "Yenagoa", "Kolokuma/Opokuma", "Nembe", "Ogbia", "Brass"]
-        elif target_state_ec8a == "Rivers State":
-            lga_options = ["Asari-Toru", "Degema", "Akuku-Toru", "Port Harcourt", "Obio-Akpor", "Bonny", "Opobo/Nkoro", "Okrika"]
-        elif target_state_ec8a == "Delta State":
-            lga_options = ["Bomadi", "Burutu", "Patani", "Warri South", "Warri North", "Warri Southwest", "Ughelli South", "Aniocha"]
-        else:
-            lga_options = ["Uyo", "Eket", "Ikot Ekpene", "Oron", "Ibeno", "Ibiono-Ibom", "Abak", "Uruan"]
-            
+        state_lga_map = STATE_DATA_LEDGER.get(target_state_ec8a, {})
+        lga_options = list(state_lga_map.keys()) if state_lga_map else ["NO COMPATIBLE LGA KEY DETECTED"]
+        
         selected_lga_ec8a = st.selectbox(f"Select LGA for {target_state_ec8a}", lga_options, key="ec8a_lga_select")
         
-        ward_options = [f"{selected_lga_ec8a} Ward {i}" for i in range(1, 14)]
+        ward_options = state_lga_map.get(selected_lga_ec8a, [f"{selected_lga_ec8a} Ward 1"])
         selected_ward_ec8a = st.selectbox(f"Select Ward for {selected_lga_ec8a}", ward_options, key="ec8a_ward_select")
         
         if st.button("📜 SCOOP AUDITED FORM EC8A LEDGER", key="btn_trigger_scoop_ec8a"):
@@ -1008,7 +1038,7 @@ elif st.session_state.current_page == "main_dashboard":
                     "Ward Block": selected_ward_ec8a.upper(),
                     "Polling Unit Identifier": f"{selected_ward_ec8a[:3].upper()}-{pu_code}",
                     "EC8A Document Capture": f"IMAGE_BLOB_SOURCE_0{pu_idx}_SECURE.PNG",
-                    "Forensic Hash Checksum": f"0xSHA256_{pu_idx}D3E98B_{selected_lga_ec8a[:3].upper()}",
+                    "Forensic Hash Checksum": f"0xSHA256_{pu_idx}D3E98B_{selected_lga_ec8a[:3].upper() if len(selected_lga_ec8a) >=3 else 'LGA'}",
                     "Audit Mismatch Discrepancy": "0.00% Zero Variance Detected"
                 })
             st.session_state.last_ec8a_df = pd.DataFrame(ec8a_records)
@@ -1053,9 +1083,9 @@ elif st.session_state.current_page == "main_dashboard":
          st.markdown("##### 📡 Live Syncing Active with National Assembly Website (NASS) Server Node Pipelines")
          
          mock_nass_bills = pd.DataFrame([
-             {"Bill ID": "SB-2026-401", "Title": "Niger Delta Environmental Remediation & Equity Act", "Sponsor": "Sen. Henry Seriake Dickson", "Current Progress Stage": "Third Reading Passed", "Last Updated": "May 2026", "Status": "Active Alignment"},
-             {"Bill ID": "SB-2026-412", "Title": "Critical Marine Infrastructure Protection Mandate Bill", "Sponsor": "Sen. Henry Seriake Dickson", "Current Progress Stage": "Committee Stage Referral", "Last Updated": "April 2026", "Status": "Pending Hearing"},
-             {"Bill ID": "SB-2026-445", "Title": "Federal Vocational Education Funding Distribution Bill", "Sponsor": "Sen. Henry Seriake Dickson", "Current Progress Stage": "First Reading Table Entry", "Last Updated": "May 2026", "Status": "Introduction Stage"}
+             {"Bill ID": "SB-2026-401", "Title": "Niger Delta Environmental Remediation & Equity Act", "Sponsor": "SENATOR HENRY SERIAKE DICKSON", "Current Progress Stage": "Third Reading Passed", "Last Updated": "May 2026", "Status": "Active Alignment"},
+             {"Bill ID": "SB-2026-412", "Title": "Critical Marine Infrastructure Protection Mandate Bill", "Sponsor": "SENATOR HENRY SERIAKE DICKSON", "Current Progress Stage": "Committee Stage Referral", "Last Updated": "April 2026", "Status": "Pending Hearing"},
+             {"Bill ID": "SB-2026-445", "Title": "Federal Vocational Education Funding Distribution Bill", "Sponsor": "SENATOR HENRY SERIAKE DICKSON", "Current Progress Stage": "First Reading Table Entry", "Last Updated": "May 2026", "Status": "Introduction Stage"}
          ]).set_index("Bill ID")
          
          st.dataframe(mock_nass_bills, width='stretch')
